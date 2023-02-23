@@ -1,10 +1,14 @@
 //Requerir de la paqueteria de colores para la linea de comandoss
 require('colors');
 
+//Para guardar los datos en el archivo de texto
+const { guardarDB, leerDB } = require('./helpers/guardarArchivo.js');
+
 //Importamos las funciones del helper
 const {inquirerMenu, 
        pausaMenu,
-       leerInput} = require('./helpers/inquirer.js');
+       leerInput,
+       listadoTareasBorrar} = require('./helpers/inquirer.js');
 
 //guardamos en constante la funcion tarea de  tarea
 //guardamos en constante la funcion tareas de tareas
@@ -17,6 +21,14 @@ const main = async() => {
     let opt = '';
     //Instancia de Tareas
     const tareas = new Tareas();
+
+    //Funcion que lee el archivo guardado
+    const tareasDB = leerDB();
+
+    //Verificamos que no sea nulo, para que asi podamos cargar tareas
+    if( tareasDB ){
+        tareas.cargarTareasFromArray( tareasDB );
+    }
 
     //Entramos al do-while y salimos hasta que la opcion escogida por el usuario sea 0
     do{
@@ -32,25 +44,32 @@ const main = async() => {
                 break;
             //'2. Listar tareas'
             case '2':
-                console.log(tareas._listado);
+                tareas.listadoCompleto();
+                //console.log(tareas.listadoArr);
                 break;
             //'3. Listar tareas completadas'
             case '3':
+                tareas.listadoCompletadas();
                 break;
             //'4. Listar tareas pendientes'
             case '4':
+                tareas.listadoPendientes();
                 break;
             //'5. Completar tarea(s)'
             case '5':
                 break;
             //'6. Borrar tarea'
             case '6':
+                const id = await listadoTareasBorrar(tareas.listadoArr);
+                console.log({ id });
                 break;
             //'0. Salir'
             case '0':
                 break;
 
         }
+
+        guardarDB( tareas.listadoArr );
 
         await pausaMenu();
 
