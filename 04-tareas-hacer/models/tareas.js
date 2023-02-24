@@ -23,7 +23,7 @@ class Tareas{
 
     borrarTarea( id = ''){
         if(this._listado[id]){
-
+            delete this._listado[id];
         }
     }
 
@@ -46,7 +46,12 @@ class Tareas{
                 const i = `${idx+1}`.green;
                 const { desc, completadoEn } = tarea;
                 const estado = (completadoEn) ? 'Completada'.green : 'Pendiente'.red;
-                console.log(`${ i }. ${ desc } :: ${ estado }`);
+                if (completadoEn){
+                    console.log(`${ i }. ${ desc } :: ${ estado } :: ${completadoEn}`);
+                }else{
+                    console.log(`${ i }. ${ desc } :: ${ estado }`);
+                }
+                
             });
         }else{
             console.log(`\n${'NO'.red} hay registros.`);
@@ -71,7 +76,7 @@ class Tareas{
                     const { completadoEn } = tarea;
                     if(completadoEn){
                         const {desc} = tarea;
-                        console.log(`${ i.toString().green }. ${ desc } :: ${ estado }`);
+                        console.log(`${ i.toString().green }. ${ desc } :: ${ estado } :: ${completadoEn} `);
                         i++;
                     }
                 });
@@ -112,6 +117,28 @@ class Tareas{
         }else{
             console.log(`\n${'NO'.red} hay registros.`);
         }
+    }
+
+    //Se reciben las ids de tareas completadas o que se quieren completar
+    toogleCompletada( ids= [] ){
+        //Capturamos las ids, y las iteramos
+        ids.forEach( id => {
+            //Del listado buscamos un registro con su id
+            const tarea = this._listado[id];
+            //Si tiene su completadoEn en false, entonces conviertelo a True, poniendole la fecha de ahora
+            if( !tarea.completadoEn ){
+                tarea.completadoEn = new Date().toISOString();
+            }
+        });
+
+        //Iteramos todas las tareas tanto completadas como las que no lo están
+        this.listadoArr.forEach( tarea => {
+            //Si del arreglo de ids pasados por parametro (completadas), no incluye alguna id del listado completo...
+            if( !ids.includes(tarea.id) ){
+                //A ese id (del listado completo), setealo en Nulo.
+                this._listado[tarea.id].completadoEn = null;
+            }
+        });
     }
 }
 

@@ -8,7 +8,9 @@ const { guardarDB, leerDB } = require('./helpers/guardarArchivo.js');
 const {inquirerMenu, 
        pausaMenu,
        leerInput,
-       listadoTareasBorrar} = require('./helpers/inquirer.js');
+       listadoTareasBorrar,
+       confirmar,
+       mostrarListadoCheckList} = require('./helpers/inquirer.js');
 
 //guardamos en constante la funcion tarea de  tarea
 //guardamos en constante la funcion tareas de tareas
@@ -57,11 +59,19 @@ const main = async() => {
                 break;
             //'5. Completar tarea(s)'
             case '5':
+                //Mostramos todas las tareas, y sus estados,y guardamos las ids de las que están completadas
+                const ids = await mostrarListadoCheckList(tareas.listadoArr);
+                //Enviamos las ids completadas
+                tareas.toogleCompletada( ids );
                 break;
             //'6. Borrar tarea'
             case '6':
                 const id = await listadoTareasBorrar(tareas.listadoArr);
-                console.log({ id });
+                const ok = await confirmar('¿Está seguro?');
+                if( ok ){
+                    tareas.borrarTarea( id );
+                    console.log('Tarea borrada');
+                }
                 break;
             //'0. Salir'
             case '0':
